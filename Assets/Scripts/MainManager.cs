@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
+
 
 public class MainManager : MonoBehaviour
 {
@@ -20,7 +22,16 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    private int HighScore;
+
+    public TMP_Text highScoreText;
+
+
+    private void Awake()
+    {
+        LoadGame();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -76,5 +87,48 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        SaveGame();
     }
+
+    public void SaveGame()
+    {
+        if (m_Points > HighScore)
+        {
+            SaveData data = PrepareSaveData(m_Points);
+            string json = JsonUtility.ToJson(data);
+
+            File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+        }       
+
+    }
+
+    public SaveData PrepareSaveData(int score)
+    {
+        SaveData saveData = new SaveData();
+        saveData.playerName = GameData.PlayerName;
+        saveData.playerScore = score;
+        return saveData;
+
+    }
+
+    public void LoadGame()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        SaveData data = new SaveData();
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            data = JsonUtility.FromJson<SaveData>(json);
+            HighScore = data.playerScore;
+        }
+
+        if (data.playerName != null)
+        {
+            highScoreText.SetText("Best Score: " + data.playerName + " : " + data.playerScore);
+        }
+    }
+
+
 }

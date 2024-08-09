@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameData : MonoBehaviour
 {
-    //Storing name as static string - a singleton is overkill for this one piece of data.
+    //Storing name and high score as statics - a singleton is overkill for this data.
+
     public static string PlayerName;
+
 }
